@@ -1,0 +1,31 @@
+services:
+  # Container do Backend Python (Flask + Gunicorn)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: gotcha_backend
+    restart: always
+    expose:
+      - "7860" # Expõe a porta internamente para a rede do Docker
+    environment:
+      - PYTHONUNBUFFERED=1 # Desativa buffering para exibir logs em tempo real
+    volumes:
+      - /tmp/uploads # Volume temporário opcional para uploads
+
+  # Container do Frontend (Vite + Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Recipe de self-host: frontend fala com o backend deste mesmo compose
+        # via proxy do nginx (/api/), sem precisar de token.
+        - VITE_BACKEND_URL=${VITE_BACKEND_URL:-/api/processar}
+        - VITE_HF_TOKEN=${VITE_HF_TOKEN:-}
+    container_name: gotcha_frontend
+    restart: always
+    ports:
+      - "${GOTCHA_PORT:-80}:80" # Porta do host (padrão 80) -> porta 80 do Nginx
+    depends_on:
+      - backend # Garante que o backend inicia antes do frontend

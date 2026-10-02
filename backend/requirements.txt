@@ -1,0 +1,24 @@
+# Força a versão CPU do PyTorch para economizar espaço
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+pandas
+numpy
+
+# Suas outras bibliotecas
+pandas
+numpy
+scikit-learn
+seaborn
+matplotlib
+scipy
+shap
+docx2txt
+python-docx
+transformers==4.23.0
+Flask
+Flask-Cors
+Werkzeug
+nltk
+pdf2docx
+pypdf
+gunicorn

@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gotcha Online | IF Sudeste MG - Campus Rio Pomba</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicons/favicon.svg">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Material Symbols: fonte estática (peso único, sem eixo FILL, que não usamos) e com
+         subconjunto de glifos (text=) contendo só os ícones realmente usados no app (school,
+         upload_file, cloud_upload, analytics, info, close, draw, smart_toy, warning, help).
+         Isso reduz o arquivo de ~1.1MB (fonte variável completa) para ~150KB. Ao adicionar um
+         novo ícone .material-symbols-outlined (ou um novo glifo desenhado no canvas do
+         scene.js), inclua o nome dele na lista abaixo, senão ele não vai renderizar. display=block
+         evita o "flash" do nome do ícone em texto (ex: "cloud_upload") antes da fonte carregar. -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block&text=school+upload_file+cloud_upload+analytics+info+close+draw+smart_toy+warning+help"
+        rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: ['class', '.dark-mode'],
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#2F9E41",
+                        "primary-dark": "#247a32",
+                        "background": "#f4f6f8",
+                        "surface": "#ffffff",
+                        "on-surface": "#1a1c1e",
+                        "on-surface-variant": "#44474e",
+                        "outline": "#74777f",
+                        "surface-container": "#f0f1f3",
+                        "dark-background": "#1a1c1e",
+                        "dark-surface": "#2d3033",
+                        "dark-on-surface": "#e2e2e6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "gutter": "24px",
+                        "container-max": "1200px",
+                        "nav-height": "72px",
+                        "margin-desktop": "64px"
+                    },
+                    "fontFamily": {
+                        "sans": ["Montserrat", "sans-serif"],
+                        "headline": ["Montserrat", "sans-serif"],
+                        "body": ["Montserrat", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="transition-colors duration-200">
+    <script>
+        // Carrega o modo escuro no body imediatamente para evitar flash
+        const savedColorMode = localStorage.getItem('if-color-mode');
+        if (savedColorMode === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
+
+    <canvas id="three-canvas"></canvas>
+
+    <!-- Top Navigation Bar -->
+    <header
+        class="fixed top-0 left-0 w-full z-50 bg-white dark:bg-dark-surface border-b border-black/5 dark:border-white/5 h-[56px] flex items-center glass-panel print:hidden">
+        <div
+            class="max-w-container-max mx-auto w-full px-margin-mobile md:px-margin-desktop flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <div class="px-3 h-8 bg-primary rounded flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">Gotcha</span>
+                    </div>
+                    <h1 class="font-bold text-base text-primary">IF Sudeste MG - Rio Pomba</h1>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-xs font-bold text-on-surface-variant dark:text-dark-on-surface/70">TEMA</span>
+                <button type="button" id="theme-mode-btn"
+                    class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-gray-300 dark:bg-primary shadow-inner"
+                    role="switch" title="Alternar Modo Escuro/Claro" aria-label="Alternar Modo Escuro/Claro">
+                    <span
+                        class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-0 dark:translate-x-5"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-[72px] pb-4 min-h-[90vh] w-full px-margin-mobile md:px-margin-desktop relative z-10 print:hidden">
+        <div class="max-w-[1000px] mx-auto space-y-4">
+            <!-- Section 1: Hero / Header -->
+            <div id="hero-section"
+                class="bg-white dark:bg-dark-surface rounded-xl p-5 shadow-sm border border-black/5 dark:border-white/10 glass-panel">
+                <h2 class="text-2xl md:text-3xl font-bold text-on-surface dark:text-dark-on-surface mb-2">Triagem de
+                    TCCs
+                </h2>
+                <p class="text-on-surface-variant dark:text-dark-on-surface/70 max-w-2xl mb-4">
+                    Bem-vindo! Esta ferramenta auxilia na triagem e identificação de indícios de uso de IA em
+                    trabalhos acadêmicos.
+                </p>
+                <div
+                    class="bg-surface-container dark:bg-dark-background rounded-lg p-4 border border-black/5 dark:border-white/5">
+                    <h3 class="text-primary font-bold mb-2 text-sm flex items-center gap-2">
+                        <span class="material-symbols-outlined">school</span>
+                        Como utilizar a ferramenta:
+                    </h3>
+                    <ul
+                        class="list-disc list-inside text-sm text-on-surface-variant dark:text-dark-on-surface/80 space-y-1">
+                        <li><strong>Formato:</strong> Aceitamos apenas arquivos no formato <strong>PDF</strong> ou
+                            <strong>DOCX</strong>.
+                        </li>
+                        <li><strong>Quantidade:</strong> Selecione um único arquivo por vez para processamento.</li>
+                        <li><strong>Análise:</strong> A ferramenta irá processar o texto e calcular métricas para
+                            auxiliar
+                            na identificação de indícios de uso de IA.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Section 2: File Drop Area -->
+            <section id="upload-section"
+                class="bg-white dark:bg-dark-surface rounded-xl p-5 shadow-sm border border-black/5 dark:border-white/10 glass-panel">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="material-symbols-outlined text-primary">upload_file</span>
+                    <h3 class="text-lg font-bold text-on-surface dark:text-dark-on-surface">Envio de Documentos</h3>
+                </div>
+                <form id="upload-form">
+                    <label for="file-upload"
+                        class="file-drop-area rounded-lg p-6 flex flex-col items-center justify-center text-center cursor-pointer mb-3">
+                        <span class="material-symbols-outlined text-5xl text-primary mb-2">cloud_upload</span>
+                        <p class="drop-title text-lg font-medium mb-1 text-on-surface dark:text-dark-on-surface">Arraste
+                            seu arquivo ou clique aqui</p>
+                        <p id="file-types-info" class="text-sm text-on-surface-variant dark:text-dark-on-surface/60">Ou
+                            clique para
+                            selecionar no seu dispositivo (PDF, DOCX)</p>
+                        <input class="hidden" type="file" id="file-upload" name="file" required>
+                    </label>
+                    <div class="flex justify-end">
+                        <button type="submit" id="submit-btn"
+                            class="px-8 py-3 rounded-lg bg-primary text-white font-semibold shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled>
+                            Iniciar Processamento
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Loading Section -->
+            <section id="loading-section"
+                class="hidden bg-white dark:bg-dark-surface rounded-xl px-5 py-4 shadow-sm border border-black/5 dark:border-white/10 flex items-center gap-4">
+                <div class="spinner spinner-sm shrink-0"></div>
+                <div class="text-left">
+                    <h3 class="text-sm font-bold text-on-surface dark:text-dark-on-surface">
+                        Analisando Documento
+                    </h3>
+                    <p class="text-xs text-on-surface-variant dark:text-dark-on-surface/70">
+                        Extraindo métricas de inteligência artificial e calculando parâmetros de texto... Aguarde.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 3: Results Section -->
+            <section id="results-section" class="hidden space-y-6">
+                <div
+                    class="bg-white dark:bg-dark-surface rounded-xl p-8 shadow-sm border border-black/5 dark:border-white/10 glass-panel">
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="material-symbols-outlined text-primary">analytics</span>
+                        <h2 class="text-lg font-bold text-on-surface dark:text-dark-on-surface">Resultados da Triagem
+                        </h2>
+                        <button type="button" id="btn-info-metricas" aria-label="O que significam essas métricas?"
+                            title="O que significam essas métricas?"
+                            class="ml-1 w-6 h-6 flex items-center justify-center rounded-full text-on-surface-variant dark:text-dark-on-surface/70 hover:bg-black/5 dark:hover:bg-white/10 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined text-lg">help</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div class="clickable bg-surface-container dark:bg-dark-background rounded-lg p-4 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                            id="card-perplexity">
+                            <h3 class="text-sm font-semibold text-on-surface-variant dark:text-dark-on-surface/70 mb-2">
+                                Média Perplexidade</h3>
+                            <p id="res-mean-perplexity" class="text-2xl font-bold text-primary">-</p>
+                        </div>
+                        <div class="clickable bg-surface-container dark:bg-dark-background rounded-lg p-4 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                            id="card-burstiness">
+                            <h3 class="text-sm font-semibold text-on-surface-variant dark:text-dark-on-surface/70 mb-2">
+                                Média Burstiness</h3>
+                            <p id="res-mean-burstiness" class="text-2xl font-bold text-primary">-</p>
+                        </div>
+                        <div class="clickable bg-surface-container dark:bg-dark-background rounded-lg p-4 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                            id="card-tokens">
+                            <h3 class="text-sm font-semibold text-on-surface-variant dark:text-dark-on-surface/70 mb-2">
+                                Média Tokens/Chunk</h3>
+                            <p id="res-mean-tokens" class="text-2xl font-bold text-primary">-</p>
+                        </div>
+                        <div class="clickable bg-surface-container dark:bg-dark-background rounded-lg p-4 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                            id="card-probabilidade">
+                            <h3 class="text-sm font-semibold text-on-surface-variant dark:text-dark-on-surface/70 mb-2">
+                                Índice de Suspeita</h3>
+                            <p id="res-mean-probabilidade" class="text-2xl font-bold text-primary">-</p>
+                        </div>
+                    </div>
+
+                    <div id="res-status-box" class="rounded-lg p-4 border-l-4 border-primary mb-6">
+                        <h3 class="font-bold text-on-surface dark:text-dark-on-surface mb-1">Nível de Desconfiança:
+                            <span id="res-suspeita" class="text-primary"></span>
+                        </h3>
+                        <p id="res-instructions" class="text-on-surface-variant dark:text-dark-on-surface/80">Aguardando
+                            dados...</p>
+                    </div>
+
+                    <div id="res-injection-alert" role="alert"
+                        class="hidden bg-red-50 dark:bg-red-900/20 border border-red-400/60 dark:border-red-700/50 rounded-lg p-4 mb-6 flex items-start gap-3">
+                        <span class="material-symbols-outlined text-red-600 dark:text-red-400 shrink-0">gpp_maybe</span>
+                        <div class="text-sm text-on-surface dark:text-dark-on-surface/90">
+                            <p><strong>Possível tentativa de manipulação da avaliação detectada.</strong>
+                                O documento contém trechos que parecem instruções dirigidas a uma IA avaliadora
+                                (por exemplo, "ignore as instruções anteriores" ou "dê nota máxima"). Isso pode
+                                indicar tentativa de enganar ferramentas automáticas e merece atenção na revisão
+                                humana. As métricas abaixo não foram alteradas por esses trechos.</p>
+                            <ul id="res-injection-list" class="list-disc list-inside mt-2 space-y-1 break-words"></ul>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-amber-50 dark:bg-amber-900/20 border border-amber-300/60 dark:border-amber-700/40 rounded-lg p-4 mb-6 flex items-start gap-3">
+                        <span
+                            class="material-symbols-outlined text-amber-600 dark:text-amber-400 shrink-0">warning</span>
+                        <p class="text-sm text-on-surface dark:text-dark-on-surface/90">
+                            <strong>Este resultado é um indicador estatístico de triagem, não uma prova de uso de
+                                IA.</strong>
+                            Ferramentas desse tipo apresentam falsos positivos e negativos conhecidos — utilize-o
+                            como ponto de partida para uma análise humana, nunca como decisão isolada.
+                        </p>
+                    </div>
+
+                    <div
+                        class="bg-surface-container dark:bg-dark-background rounded-lg p-4 border border-black/5 dark:border-white/5">
+                        <h3 class="text-primary font-bold mb-2 flex items-center gap-2">
+                            <span class="material-symbols-outlined">info</span>
+                            Instruções Adicionais para Avaliação:
+                        </h3>
+                        <ul
+                            class="list-disc list-inside text-sm text-on-surface-variant dark:text-dark-on-surface/80 space-y-1 ml-2">
+                            <li>Conferir a consistência e a formatação das <strong>referências bibliográficas</strong>.
+                            </li>
+                            <li>Verificar os <strong>nomes dos autores</strong> e afiliações informadas.</li>
+                            <li>Checar a coerência geral do texto e atentar-se a possíveis alucinações de IA.</li>
+                            <li>Analisar se o estilo de escrita condiz com trabalhos anteriores do aluno, se aplicável.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row items-center justify-end gap-4 pt-4">
+                    <button id="reset-btn"
+                        class="w-full sm:w-auto px-8 py-3 rounded-lg bg-white dark:bg-dark-surface border-2 border-primary text-primary font-semibold hover:bg-primary hover:text-white transition-all active:scale-95">
+                        Nova Análise
+                    </button>
+                    <button id="download-pdf-btn"
+                        class="w-full sm:w-auto px-8 py-3 rounded-lg bg-primary text-white font-semibold shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all active:scale-95">
+                        Baixar Relatório de Apoio (PDF)
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modal Tabela -->
+    <div id="modal-tabela"
+        class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 print:hidden">
+        <div
+            class="bg-white dark:bg-dark-surface w-full max-w-4xl max-h-[80vh] rounded-xl shadow-2xl flex flex-col relative overflow-hidden border border-black/5 dark:border-white/10">
+            <div
+                class="p-6 border-b border-black/5 dark:border-white/10 flex justify-between items-center bg-surface-container dark:bg-dark-background">
+                <h2 class="text-xl font-bold text-primary uppercase tracking-wide">Detalhes por Chunk</h2>
+                <button id="close-modal" aria-label="Fechar"
+                    class="text-on-surface-variant hover:text-red-500 transition-colors">
+                    <span class="material-symbols-outlined text-3xl">close</span>
+                </button>
+            </div>
+            <div class="overflow-y-auto p-6">
+                <p class="text-xs text-on-surface-variant dark:text-dark-on-surface/70 mb-4">
+                    O nível de risco por trecho é uma estimativa estatística, não uma classificação definitiva —
+                    trechos isolados podem ser mal classificados.
+                </p>
+                <table class="w-full text-left border-collapse">
+                    <thead class="sticky top-0 bg-white dark:bg-dark-surface shadow-sm">
+                        <tr>
+                            <th class="p-3 border-b-2 border-primary text-primary font-bold">ID</th>
+                            <th class="p-3 border-b-2 border-primary text-primary font-bold">Trecho</th>
+                            <th class="p-3 border-b-2 border-primary text-primary font-bold">Perplexidade</th>
+                            <th class="p-3 border-b-2 border-primary text-primary font-bold">Burstiness</th>
+                            <th class="p-3 border-b-2 border-primary text-primary font-bold">Tokens</th>
+                            <th class="p-3 border-b-2 border-primary text-primary font-bold">Nível de Risco</th>
+                            <th class="p-3 border-b-2 border-primary text-primary font-bold">Probab. IA</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-body"
+                        class="text-on-surface dark:text-dark-on-surface text-sm divide-y divide-black/5 dark:divide-white/5">
+                        <!-- Conteúdo dinâmico -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Métricas -->
+    <div id="modal-metricas"
+        class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 print:hidden">
+        <div
+            class="bg-white dark:bg-dark-surface w-full max-w-lg max-h-[80vh] rounded-xl shadow-2xl flex flex-col relative overflow-hidden border border-black/5 dark:border-white/10">
+            <div
+                class="p-6 border-b border-black/5 dark:border-white/10 flex justify-between items-center bg-surface-container dark:bg-dark-background">
+                <h2 class="text-xl font-bold text-primary uppercase tracking-wide">Como Interpretar as Métricas</h2>
+                <button id="close-modal-metricas" aria-label="Fechar"
+                    class="text-on-surface-variant hover:text-red-500 transition-colors">
+                    <span class="material-symbols-outlined text-3xl">close</span>
+                </button>
+            </div>
+            <div class="overflow-y-auto p-6 space-y-4 text-sm text-on-surface-variant dark:text-dark-on-surface/80">
+                <div>
+                    <h3 class="font-bold text-on-surface dark:text-dark-on-surface mb-1">Média Perplexidade</h3>
+                    <p>Mede o quão previsível o texto é para um modelo de linguagem. Textos de IA tendem a ser mais
+                        previsíveis (valores mais baixos), mas o estilo do autor também influencia bastante.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-on-surface dark:text-dark-on-surface mb-1">Média Burstiness</h3>
+                    <p>Mede a variação no tamanho das frases. Autores humanos costumam alternar frases curtas e
+                        longas de forma mais irregular que textos gerados por IA.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-on-surface dark:text-dark-on-surface mb-1">Média Tokens/Chunk</h3>
+                    <p>Quantidade média de tokens (unidades de texto processadas pelo modelo) em cada trecho
+                        analisado do documento.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-on-surface dark:text-dark-on-surface mb-1">Índice de Suspeita (não é
+                        prova)</h3>
+                    <p>Saída de um classificador estatístico (ExtraTrees) treinado sobre as métricas acima. É
+                        sujeita a erros — não confirma nem descarta uso de IA. Use como ponto de partida para uma
+                        análise humana, nunca como decisão isolada.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-on-surface dark:text-dark-on-surface mb-1">Nível de Desconfiança</h3>
+                    <p>Resumo do Índice de Suspeita em três faixas — Baixo, Médio ou Alto — pra facilitar a leitura
+                        rápida do resultado geral do documento.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Privacidade -->
+    <div id="modal-privacidade"
+        class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 print:hidden">
+        <div
+            class="bg-white dark:bg-dark-surface w-full max-w-lg max-h-[80vh] rounded-xl shadow-2xl flex flex-col relative overflow-hidden border border-black/5 dark:border-white/10">
+            <div
+                class="p-6 border-b border-black/5 dark:border-white/10 flex justify-between items-center bg-surface-container dark:bg-dark-background">
+                <h2 class="text-xl font-bold text-primary uppercase tracking-wide">Privacidade</h2>
+                <button id="close-modal-privacidade" aria-label="Fechar"
+                    class="text-on-surface-variant hover:text-red-500 transition-colors">
+                    <span class="material-symbols-outlined text-3xl">close</span>
+                </button>
+            </div>
+            <div class="overflow-y-auto p-6 space-y-3 text-sm text-on-surface-variant dark:text-dark-on-surface/80">
+                <p><strong class="text-on-surface dark:text-dark-on-surface">Não armazenamos seu arquivo.</strong> O
+                    PDF ou DOCX enviado é processado apenas em memória durante a sua sessão e é descartado
+                    automaticamente assim que a análise termina. Nenhuma cópia do documento ou do texto extraído fica
+                    salva em nossos servidores.</p>
+                <p><strong class="text-on-surface dark:text-dark-on-surface">Baixe o relatório antes de sair.</strong>
+                    Como nada é salvo, o relatório em PDF gerado ao final é a sua única cópia dos resultados. Se você
+                    atualizar a página, fechar a aba ou perder a conexão sem baixar o relatório, será necessário
+                    enviar o arquivo novamente para gerar uma nova análise.</p>
+                <p>Os dados extraídos (perplexidade, burstiness, tokens e probabilidade de uso de IA) são usados
+                    exclusivamente para compor o relatório exibido a você e não são compartilhados com terceiros.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Acessibilidade -->
+    <div id="modal-acessibilidade"
+        class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 print:hidden">
+        <div
+            class="bg-white dark:bg-dark-surface w-full max-w-lg max-h-[80vh] rounded-xl shadow-2xl flex flex-col relative overflow-hidden border border-black/5 dark:border-white/10">
+            <div
+                class="p-6 border-b border-black/5 dark:border-white/10 flex justify-between items-center bg-surface-container dark:bg-dark-background">
+                <h2 class="text-xl font-bold text-primary uppercase tracking-wide">Acessibilidade</h2>
+                <button id="close-modal-acessibilidade" aria-label="Fechar"
+                    class="text-on-surface-variant hover:text-red-500 transition-colors">
+                    <span class="material-symbols-outlined text-3xl">close</span>
+                </button>
+            </div>
+            <div class="overflow-y-auto p-6 space-y-3 text-sm text-on-surface-variant dark:text-dark-on-surface/80">
+                <p>Buscamos tornar o Gotcha Online utilizável pelo maior número possível de pessoas. Alguns recursos
+                    já disponíveis:</p>
+                <ul class="list-disc list-inside space-y-1 ml-2">
+                    <li>Modo escuro e modo claro, com bom contraste, alternável a qualquer momento pelo botão
+                        <strong class="text-on-surface dark:text-dark-on-surface">TEMA</strong> no topo da página.
+                    </li>
+                    <li>Navegação por teclado: campos, botões e a área de envio de arquivo podem ser acessados com
+                        Tab e ativados com Enter ou Espaço.</li>
+                    <li>Layout responsivo, que se adapta a diferentes tamanhos de tela e ao zoom do navegador.</li>
+                    <li>Botões que usam apenas ícone (como este de fechar) têm um rótulo descritivo para leitores de
+                        tela.</li>
+                </ul>
+                <p>Ainda estamos evoluindo essa frente. Se você utiliza tecnologia assistiva e encontrar
+                    dificuldades, relate ao responsável pelo projeto na sua instituição para que possamos priorizar
+                    melhorias.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Sobre a Pesquisa -->
+    <div id="modal-pesquisa"
+        class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 print:hidden">
+        <div
+            class="bg-white dark:bg-dark-surface w-full max-w-2xl max-h-[80vh] rounded-xl shadow-2xl flex flex-col relative overflow-hidden border border-black/5 dark:border-white/10">
+            <div
+                class="p-6 border-b border-black/5 dark:border-white/10 flex justify-between items-center bg-surface-container dark:bg-dark-background">
+                <h2 class="text-xl font-bold text-primary uppercase tracking-wide">Sobre a Pesquisa</h2>
+                <button id="close-modal-pesquisa" aria-label="Fechar"
+                    class="text-on-surface-variant hover:text-red-500 transition-colors">
+                    <span class="material-symbols-outlined text-3xl">close</span>
+                </button>
+            </div>
+            <div class="overflow-y-auto p-6 space-y-4 text-sm text-on-surface-variant dark:text-dark-on-surface/80">
+                <p>
+                    O Gotcha Online foi desenvolvido pelo aluno <strong
+                        class="text-on-surface dark:text-dark-on-surface">João Victor Superbi</strong> e representa a
+                    evolução prática de sua pesquisa acadêmica no IF Sudeste MG – Campus Rio Pomba, em duas frentes
+                    integradas.
+                </p>
+                <div>
+                    <h3 class="font-bold text-on-surface dark:text-dark-on-surface mb-1">Iniciação Científica</h3>
+                    <p>Testar e validar o projeto original <strong
+                            class="text-on-surface dark:text-dark-on-surface">Gotcha GPT</strong> utilizando um
+                        dataset de Trabalhos de Conclusão de Curso (TCCs) do instituto.</p>
+                    <p class="text-xs mt-1">Orientador: Hernando José Rocha Franco · Coorientador: Lucas Lattari.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-on-surface dark:text-dark-on-surface mb-1">Trabalho de Conclusão de
+                        Curso (TCC)</h3>
+                    <p>Criação de um dataset novo, próprio e direcionado ao contexto da instituição de ensino. A
+                        partir dele, foi gerada e treinada uma segunda versão do modelo, usado nesta ferramenta.</p>
+                    <p class="text-xs mt-1">Orientador: Lucas Lattari · Coorientador: Hernando José Rocha Franco.</p>
+                </div>
+                <div
+                    class="bg-surface-container dark:bg-dark-background rounded-lg p-4 border border-black/5 dark:border-white/5">
+                    <h3 class="font-bold text-on-surface dark:text-dark-on-surface mb-1">Referência ao projeto
+                        original (Gotcha GPT)</h3>
+                    <p>O Gotcha Online se baseia e expande o trabalho do Gotcha GPT, de João Gabriel Gralha e André
+                        Silva Pimentel:</p>
+                    <p class="mt-1">
+                        <em>Gotcha GPT: Ensuring the Integrity in Academic Writing</em> — Journal of Chemical
+                        Information and Modeling, 2024.
+                        <a href="https://pubs.acs.org/doi/10.1021/acs.jcim.4c01203" target="_blank"
+                            rel="noopener noreferrer" class="text-primary hover:underline">DOI:
+                            10.1021/acs.jcim.4c01203</a>
+                    </p>
+                    <p class="mt-1">
+                        Repositório original:
+                        <a href="https://github.com/andresilvapimentel/Gotcha-GPT" target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-primary hover:underline">github.com/andresilvapimentel/Gotcha-GPT</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Report Template -->
+    <div id="report-template-container" class="print-only">
+        <div id="report-template"
+            style="padding: 20px; font-family: 'Roboto', sans-serif; color: #333; background: #fff;">
+            <div
+                style="border-bottom: 3px solid #2F9E41; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1
+                        style="margin: 0; color: #2F9E41; font-family: 'Roboto', sans-serif; font-size: 1.8em; font-weight: bold;">
+                        Gotcha Online</h1>
+                    <h4
+                        style="margin: 2px 0 0; color: #C8191E; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.85em;">
+                        IF Sudeste MG - Campus Rio Pomba</h4>
+                </div>
+                <div style="text-align: right;">
+                    <h3 style="margin: 0; color: #555; font-size: 1.1em;">Relatório de Triagem de Texto</h3>
+                </div>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <p style="margin: 5px 0;"><strong>Arquivo Analisado:</strong> <span id="rep-filename">-</span></p>
+                <p style="margin: 5px 0;"><strong>Data/Hora da Análise:</strong> <span id="rep-datetime">-</span></p>
+            </div>
+
+            <div
+                style="background: #fff8e6; border: 1px solid #f0d78c; border-radius: 4px; padding: 12px 15px; margin-bottom: 20px; font-size: 0.85em; color: #6b5410;">
+                <strong>Aviso:</strong> este relatório é um indicador estatístico de triagem, não uma prova de uso de
+                IA. Utilize-o como ponto de partida para uma análise humana, nunca como decisão isolada.
+            </div>
+
+            <div id="rep-injection-alert"
+                style="display: none; background: #fdecec; border: 1px solid #e29a9c; border-left: 4px solid #C8191E; border-radius: 4px; padding: 12px 15px; margin-bottom: 20px; font-size: 0.85em; color: #7a1215;">
+                <strong>Alerta: possível tentativa de manipulação da avaliação.</strong> O documento contém trechos
+                que parecem instruções dirigidas a uma IA avaliadora (ex.: "ignore as instruções anteriores", "dê
+                nota máxima"). Recomenda-se atenção especial na revisão humana.
+                <ul id="rep-injection-list" style="margin: 8px 0 0; padding-left: 20px;"></ul>
+            </div>
+
+            <div
+                style="display: flex; justify-content: space-between; background: #f4f4f4; padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center;">
+                <div>
+                    <div style="font-size: 0.8em; color: #777;">Média Perplexidade</div>
+                    <div style="font-weight: bold; font-size: 1.2em;" id="rep-mean-perplexity">-</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.8em; color: #777;">Média Burstiness</div>
+                    <div style="font-weight: bold; font-size: 1.2em;" id="rep-mean-burstiness">-</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.8em; color: #777;">Tokens/Chunk</div>
+                    <div style="font-weight: bold; font-size: 1.2em;" id="rep-mean-tokens">-</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.8em; color: #777;">Índice de Suspeita</div>
+                    <div style="font-weight: bold; font-size: 1.2em;" id="rep-mean-probabilidade">-</div>
+                </div>
+            </div>
+
+            <div
+                style="background: #fdfdfd; border-left: 4px solid #2F9E41; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                <h3 style="color: #2F9E41; margin-top: 0; margin-bottom: 10px;">Instruções Adicionais para Avaliação:
+                </h3>
+                <ul style="margin-left: 20px; color: #555; line-height: 1.6; margin-bottom: 0; padding-left: 15px;">
+                    <li>Conferir a consistência e a formatação das <strong>referências bibliográficas</strong>.</li>
+                    <li>Verificar os <strong>nomes dos autores</strong> e afiliações informadas.</li>
+                    <li>Checar a coerência geral do texto e atentar-se a possíveis alucinações de IA.</li>
+                    <li>Analisar se o estilo de escrita condiz com trabalhos anteriores do aluno, se aplicável.</li>
+                </ul>
+            </div>
+
+            <h3 style="color: #1a1a2e; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Detalhes por Chunk</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85em;">
+                <thead>
+                    <tr style="background: #2F9E41; color: #fff;">
+                        <th style="padding: 8px; border: 1px solid #ccc;">ID</th>
+                        <th style="padding: 8px; border: 1px solid #ccc;">Trecho</th>
+                        <th style="padding: 8px; border: 1px solid #ccc;">Perplexidade</th>
+                        <th style="padding: 8px; border: 1px solid #ccc;">Burstiness</th>
+                        <th style="padding: 8px; border: 1px solid #ccc;">Tokens</th>
+                        <th style="padding: 8px; border: 1px solid #ccc;">Nível de Risco</th>
+                        <th style="padding: 8px; border: 1px solid #ccc;">Probab. IA</th>
+                    </tr>
+                </thead>
+                <tbody id="rep-tabela-body">
+                </tbody>
+            </table>
+            <div
+                style="margin-top: 30px; padding-top: 15px; border-top: 2px solid #2F9E41; font-size: 0.8em; color: #555; text-align: center; line-height: 1.5;">
+                Relatório gerado automaticamente com base em indicadores estatísticos (perplexidade, burstiness e
+                classificador supervisionado). Não constitui prova conclusiva de uso de inteligência artificial e não
+                deve fundamentar isoladamente decisões disciplinares. Desenvolvido no âmbito de Iniciação Científica
+                e TCC do IF Sudeste MG — Campus Rio Pomba.
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer
+        class="w-full bg-white dark:bg-dark-surface border-t border-black/5 dark:border-white/5 py-4 px-margin-mobile md:px-margin-desktop mt-8 relative z-10 print:hidden">
+        <div class="max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="flex flex-col items-center md:items-start gap-2">
+                <div class="flex items-center gap-2">
+                    <div class="px-2 h-8 bg-primary rounded flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">Gotcha</span>
+                    </div>
+                    <span class="font-bold text-xl text-on-surface dark:text-dark-on-surface">IF Sudeste MG - Rio
+                        Pomba</span>
+                </div>
+                <p class="text-sm text-on-surface-variant dark:text-dark-on-surface/60">© 2026 Instituto Federal do
+                    Sudeste de Minas Gerais. Todos os direitos reservados.</p>
+            </div>
+            <div class="flex gap-8">
+                <button type="button" id="footer-privacidade-btn"
+                    class="text-sm font-medium text-on-surface-variant dark:text-dark-on-surface/70 hover:text-primary transition-colors">Privacidade</button>
+                <button type="button" id="footer-pesquisa-btn"
+                    class="text-sm font-medium text-on-surface-variant dark:text-dark-on-surface/70 hover:text-primary transition-colors">Sobre
+                    a
+                    Pesquisa</button>
+                <button type="button" id="footer-acessibilidade-btn"
+                    class="text-sm font-medium text-on-surface-variant dark:text-dark-on-surface/70 hover:text-primary transition-colors">Acessibilidade</button>
+            </div>
+        </div>
+
+        <!-- Origem do projeto e apoio institucional -->
+        <div
+            class="max-w-container-max mx-auto w-full border-t border-black/5 dark:border-white/10 mt-4 pt-4 flex flex-col md:flex-row items-center justify-between gap-6">
+            <p class="text-xs text-on-surface-variant dark:text-dark-on-surface/60 max-w-2xl text-center md:text-left">
+                Este projeto é um resultado do projeto de Iniciação Científica <strong
+                    class="text-on-surface-variant dark:text-dark-on-surface/80">Análise Comparativa de Desempenho de
+                    Ferramentas para Detecção de Texto Gerado por IA em Contextos Acadêmicos
+                </strong>
+                (Edital nº <strong class="text-on-surface-variant dark:text-dark-on-surface/80">0009/2025</strong>),
+                desenvolvido com apoio do <strong class="text-on-surface-variant dark:text-dark-on-surface/80">IF
+                    Sudeste MG – Campus Rio
+                    Pomba</strong> e da <strong
+                    class="text-on-surface-variant dark:text-dark-on-surface/80">FAPEMIG</strong>.
+            </p>
+            <div class="flex items-center gap-4 shrink-0">
+                <!-- Fundo branco fixo (independente do tema) porque as duas logos têm marcas
+                     escuras, que ficariam com pouco contraste no modo escuro. h-9 + w-auto +
+                     object-contain garante a mesma altura pras duas, com a largura de cada uma
+                     ajustada proporcionalmente ao seu próprio tamanho original. -->
+                <div class="relative h-12 flex items-center justify-center bg-white rounded-md px-3 shadow-sm">
+                    <img src="assets/images/logo_IF.png" alt="Logo IF Sudeste MG" class="h-9 w-auto object-contain"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div style="display: none;"
+                        class="h-9 px-3 items-center justify-center rounded border border-dashed border-on-surface-variant/40 text-[10px] text-on-surface-variant/70 text-center leading-tight">
+                        Logo<br>IF Sudeste MG
+                    </div>
+                </div>
+                <div class="relative h-12 flex items-center justify-center bg-white rounded-md px-3 shadow-sm">
+                    <img src="assets/images/logo_fapemig.png" alt="Logo FAPEMIG" class="h-9 w-auto object-contain"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div style="display: none;"
+                        class="h-9 px-3 items-center justify-center rounded border border-dashed border-on-surface-variant/40 text-[10px] text-on-surface-variant/70 text-center leading-tight">
+                        Logo<br>FAPEMIG
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script type="module" src="src/app/main.js"></script>
+</body>
+
+</html>

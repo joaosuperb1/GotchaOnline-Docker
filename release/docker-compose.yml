@@ -1,0 +1,42 @@
+# Gotcha Online — compose de release.
+#
+# Este é o único arquivo necessário para instalar: ele baixa o código direto
+# do GitHub e builda as duas imagens na sua máquina (precisa de internet na
+# primeira subida). Uso:
+#
+#   docker compose up -d --build
+#
+# Variáveis opcionais (no ambiente ou em um arquivo .env ao lado deste):
+#   GOTCHA_REF   branch ou tag do repositório a instalar (padrão: main).
+#                Ex.: GOTCHA_REF=v1.0.0 para fixar uma versão.
+#   GOTCHA_PORT  porta do host onde o site fica disponível (padrão: 80).
+
+services:
+  # API Flask + Gunicorn (GPT-2 + classificador). Não é exposta ao host: só o
+  # frontend alcança, pela rede interna do Docker.
+  backend:
+    build:
+      context: https://github.com/joaosuperb1/GotchaOnline-Docker.git#${GOTCHA_REF:-main}:backend
+    image: gotcha-backend:latest
+    container_name: gotcha_backend
+    restart: always
+    expose:
+      - "7860"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - /tmp/uploads
+
+  # Nginx servindo o site e fazendo proxy de /api/ para o backend.
+  frontend:
+    build:
+      context: https://github.com/joaosuperb1/GotchaOnline-Docker.git#${GOTCHA_REF:-main}:frontend
+      args:
+        - VITE_BACKEND_URL=/api/processar
+    image: gotcha-frontend:latest
+    container_name: gotcha_frontend
+    restart: always
+    ports:
+      - "${GOTCHA_PORT:-80}:80"
+    depends_on:
+      - backend
