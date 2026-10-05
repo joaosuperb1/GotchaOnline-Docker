@@ -8,7 +8,7 @@ O **Gotcha Online** é um detector desenvolvido para discriminar manuscritos aca
 
 Este projeto foi o resultado da minha iniciação científica.
 
-- **Objetivo**: criação de um dataset novo, próprio e altamente direcionado ao contexto da instituição de ensino. A partir desse dataset exclusivo, foi gerada e treinada uma **segunda versão do modelo de aprendizado de máquina**, adaptada ao protocolo do projeto original **Gotcha GPT**.
+- **Objetivo**: criação de um dataset novo, próprio e altamente direcionado ao contexto da instituição de ensino. A partir desse dataset exclusivo, foi gerada e treinada uma **segunda versão do modelo**, adaptada do projeto original **Gotcha GPT**.
 - **Orientador**: Hernando José Rocha Franco
 - **Coorientador**: Lucas Lattari
 

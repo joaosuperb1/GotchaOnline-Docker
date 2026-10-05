@@ -32,7 +32,8 @@ try:
     modelo_extra_trees = joblib.load(caminho_modelo_et)
     print("Modelo ExtraTrees carregado com sucesso.")
 except Exception as e:
-    print(f"Erro ao carregar ModeloIF_Final.joblib: {e}")
+    print(f"ERRO: não foi possível carregar {caminho_modelo_et}: {e}. "
+          "As análises sairão SEM predição de IA até o modelo ser corrigido.")
     modelo_extra_trees = None
 
 # --- 1. FUNÇÕES DE EXTRAÇÃO E CHUNKING ---
@@ -396,5 +397,12 @@ def analisar_arquivo_stream(caminho_do_arquivo):
         "media_perplexity": round(np.mean(scores_perplexity), 2),
         "media_tokens": round(np.mean(scores_tokens), 2),
         "media_probabilidade_ia": media_probabilidade,
-        "instrucoes": "Métricas calculadas e predição de IA realizada com sucesso."
+        "modelo_disponivel": media_probabilidade is not None,
+        "instrucoes": (
+            "Métricas calculadas e predição de IA realizada com sucesso."
+            if media_probabilidade is not None else
+            "Atenção: o classificador não está disponível neste servidor, então o Índice de "
+            "Suspeita não pôde ser calculado. Perplexidade, burstiness e tokens foram calculados "
+            "normalmente. Avise o administrador do sistema."
+        )
     }) + "\n"
