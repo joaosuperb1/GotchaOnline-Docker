@@ -11,13 +11,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <!-- Material Symbols: fonte estática (peso único, sem eixo FILL, que não usamos) e com
-         subconjunto de glifos (text=) contendo só os ícones realmente usados no app (school,
-         upload_file, cloud_upload, analytics, info, close, draw, smart_toy, warning, help).
-         Isso reduz o arquivo de ~1.1MB (fonte variável completa) para ~150KB. Ao adicionar um
-         novo ícone .material-symbols-outlined (ou um novo glifo desenhado no canvas do
-         scene.js), inclua o nome dele na lista abaixo, senão ele não vai renderizar. display=block
-         evita o "flash" do nome do ícone em texto (ex: "cloud_upload") antes da fonte carregar. -->
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block&text=school+upload_file+cloud_upload+analytics+info+close+draw+smart_toy+warning+help"
         rel="stylesheet">
@@ -243,7 +236,7 @@
                         <p class="text-sm text-on-surface dark:text-dark-on-surface/90">
                             <strong>Este resultado é um indicador estatístico de triagem, não uma prova de uso de
                                 IA.</strong>
-                            Ferramentas desse tipo apresentam falsos positivos e negativos conhecidos — utilize-o
+                            Ferramentas desse tipo apresentam falsos positivos e negativos conhecidos, utilize-o
                             como ponto de partida para uma análise humana, nunca como decisão isolada.
                         </p>
                     </div>
@@ -296,8 +289,7 @@
             </div>
             <div class="overflow-y-auto p-6">
                 <p class="text-xs text-on-surface-variant dark:text-dark-on-surface/70 mb-4">
-                    O nível de risco por trecho é uma estimativa estatística, não uma classificação definitiva —
-                    trechos isolados podem ser mal classificados.
+                    O nível de risco por trecho é uma estimativa estatística, não uma classificação definitiva, trechos isolados podem ser mal classificados.
                 </p>
                 <table class="w-full text-left border-collapse">
                     <thead class="sticky top-0 bg-white dark:bg-dark-surface shadow-sm">
@@ -353,12 +345,12 @@
                     <h3 class="font-bold text-on-surface dark:text-dark-on-surface mb-1">Índice de Suspeita (não é
                         prova)</h3>
                     <p>Saída de um classificador estatístico (ExtraTrees) treinado sobre as métricas acima. É
-                        sujeita a erros — não confirma nem descarta uso de IA. Use como ponto de partida para uma
+                        sujeita a erros, não confirma nem descarta uso de IA. Use como ponto de partida para uma
                         análise humana, nunca como decisão isolada.</p>
                 </div>
                 <div>
                     <h3 class="font-bold text-on-surface dark:text-dark-on-surface mb-1">Nível de Desconfiança</h3>
-                    <p>Resumo do Índice de Suspeita em três faixas — Baixo, Médio ou Alto — pra facilitar a leitura
+                    <p>Resumo do Índice de Suspeita em três faixas [Baixo, Médio ou Alto] pra facilitar a leitura
                         rápida do resultado geral do documento.</p>
                 </div>
             </div>
@@ -448,16 +440,18 @@
                 </p>
                 <div>
                     <h3 class="font-bold text-on-surface dark:text-dark-on-surface mb-1">Iniciação Científica</h3>
-                    <p>Testar e validar o projeto original <strong
-                            class="text-on-surface dark:text-dark-on-surface">Gotcha GPT</strong> utilizando um
-                        dataset de Trabalhos de Conclusão de Curso (TCCs) do instituto.</p>
+                    <p>O objetivo foi testar e validar o projeto original <strong
+                            class="text-on-surface dark:text-dark-on-surface">Gotcha GPT</strong> no contexto do
+                        instituto. Para isso, foi criado um dataset novo e próprio, construído a partir de Trabalhos
+                        de Conclusão de Curso (TCCs) da instituição. Com esse dataset exclusivo, foi gerada e treinada
+                        uma segunda versão do modelo extratree, que é a utilizada nesta
+                        ferramenta.</p>
                     <p class="text-xs mt-1">Orientador: Hernando José Rocha Franco · Coorientador: Lucas Lattari.</p>
                 </div>
                 <div>
                     <h3 class="font-bold text-on-surface dark:text-dark-on-surface mb-1">Trabalho de Conclusão de
                         Curso (TCC)</h3>
-                    <p>Criação de um dataset novo, próprio e direcionado ao contexto da instituição de ensino. A
-                        partir dele, foi gerada e treinada uma segunda versão do modelo, usado nesta ferramenta.</p>
+                    <p>---</p>
                     <p class="text-xs mt-1">Orientador: Lucas Lattari · Coorientador: Hernando José Rocha Franco.</p>
                 </div>
                 <div
@@ -467,7 +461,7 @@
                     <p>O Gotcha Online se baseia e expande o trabalho do Gotcha GPT, de João Gabriel Gralha e André
                         Silva Pimentel:</p>
                     <p class="mt-1">
-                        <em>Gotcha GPT: Ensuring the Integrity in Academic Writing</em> — Journal of Chemical
+                        <em>Gotcha GPT: Ensuring the Integrity in Academic Writing</em> - Journal of Chemical
                         Information and Modeling, 2024.
                         <a href="https://pubs.acs.org/doi/10.1021/acs.jcim.4c01203" target="_blank"
                             rel="noopener noreferrer" class="text-primary hover:underline">DOI:
@@ -574,7 +568,7 @@
                 Relatório gerado automaticamente com base em indicadores estatísticos (perplexidade, burstiness e
                 classificador supervisionado). Não constitui prova conclusiva de uso de inteligência artificial e não
                 deve fundamentar isoladamente decisões disciplinares. Desenvolvido no âmbito de Iniciação Científica
-                e TCC do IF Sudeste MG — Campus Rio Pomba.
+                e TCC do IF Sudeste MG - Campus Rio Pomba.
             </div>
         </div>
     </div>
@@ -621,10 +615,6 @@
                     class="text-on-surface-variant dark:text-dark-on-surface/80">FAPEMIG</strong>.
             </p>
             <div class="flex items-center gap-4 shrink-0">
-                <!-- Fundo branco fixo (independente do tema) porque as duas logos têm marcas
-                     escuras, que ficariam com pouco contraste no modo escuro. h-9 + w-auto +
-                     object-contain garante a mesma altura pras duas, com a largura de cada uma
-                     ajustada proporcionalmente ao seu próprio tamanho original. -->
                 <div class="relative h-12 flex items-center justify-center bg-white rounded-md px-3 shadow-sm">
                     <img src="assets/images/logo_IF.png" alt="Logo IF Sudeste MG" class="h-9 w-auto object-contain"
                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">

@@ -1,0 +1,20 @@
+# Cria a release no GitHub quando uma tag v* é enviada (git push origin v1.1),
+# anexando o docker-compose.yml de produção.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release/docker-compose.yml
+          generate_release_notes: true

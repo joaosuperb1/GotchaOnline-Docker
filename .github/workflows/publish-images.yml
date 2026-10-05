@@ -1,0 +1,69 @@
+# Publica as imagens Docker (backend e frontend) no GitHub Container Registry.
+#
+# - Push no main (alterando backend/ ou frontend/): publica :latest e :sha-<commit>.
+#   É o :latest que o Watchtower do servidor de produção acompanha.
+# - Push de tag v*: publica também a imagem com o nome da tag (ex.: :v1.1).
+# - Também pode ser disparado manualmente pela aba Actions.
+name: Publish images
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - ".github/workflows/publish-images.yml"
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: gotcha-backend
+            context: ./backend
+            build-args: ""
+          - image: gotcha-frontend
+            context: ./frontend
+            # Mesmo valor do compose de self-host: o nginx faz proxy de /api/.
+            build-args: |
+              VITE_BACKEND_URL=/api/processar
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Metadados das imagens
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=sha,prefix=sha-
+            type=ref,event=tag
+
+      - name: Build e push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: ${{ matrix.build-args }}
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}

@@ -102,7 +102,9 @@ export async function processarEvento(data, historicoChunks) {
 
             const riscoGeral = classificarRisco(data.media_probabilidade_ia);
             if (resSuspeita) {
-                resSuspeita.textContent = riscoGeral.label.replace('Risco ', '');
+                resSuspeita.textContent = data.media_probabilidade_ia == null
+                    ? 'Indisponível'
+                    : riscoGeral.label.replace('Risco ', '');
                 resSuspeita.style.color = riscoGeral.cor;
             }
             if (resStatusBox) {
