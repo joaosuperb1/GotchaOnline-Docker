@@ -80,9 +80,12 @@ GotchaOnline/
 │   ├── Dockerfile            # Dockerfile de produção do frontend
 │   ├── vite.config.js        # Config do Vite (remove comentários do index.html só no build)
 │   └── package.json          # Dependências do Node.js (Vite, Three.js) e scripts
+├── .github/workflows/
+│   ├── publish-images.yml    # Builda e publica as imagens no GHCR (push no main e tags v*)
+│   └── release.yml           # Cria a release no GitHub quando uma tag v* é enviada
 ├── docker-compose.yml        # Compose para rodar a partir do código-fonte (build local)
 ├── release/
-│   └── docker-compose.yml    # Compose publicado nos Releases (baixa o código do GitHub)
+│   └── docker-compose.yml    # Compose de produção publicado nos Releases (imagens do GHCR + Watchtower)
 └── README.md                 # Esta documentação do projeto
 ```
 
@@ -92,18 +95,18 @@ GotchaOnline/
 
 Há três formas de executar o Gotcha Online:
 
-1. **Docker Compose via Release** (recomendado): você baixa um único arquivo e o Docker faz o resto.
+1. **Docker Compose via Release** (recomendado): você baixa um único arquivo, o Docker baixa as imagens prontas e se mantém atualizado sozinho.
 2. **Docker Compose a partir do código-fonte**: clone o repositório e faça o build local.
 3. **Execução manual** (modo desenvolvimento), sem Docker.
 
 ### Opção 1: Docker Compose via Release (recomendado)
 
-Não precisa clonar o repositório nem instalar Python ou Node.js: o `docker-compose.yml` do release baixa o código do GitHub e constrói as duas imagens (backend e frontend) na sua máquina.
+Não precisa clonar o repositório nem instalar Python ou Node.js: o `docker-compose.yml` do release baixa as imagens prontas (backend e frontend) do GitHub Container Registry, sem build local. Ele inclui também o [Watchtower](https://github.com/nicholas-fedor/watchtower), que verifica o registro periodicamente e atualiza os containers sozinho quando uma imagem nova é publicada.
 
 **Requisitos**
 
 - [Docker](https://www.docker.com/) com o plugin Docker Compose v2 (`docker compose version` deve funcionar).
-- Acesso à internet na primeira subida (baixa o PyTorch, o GPT-2 e as dependências do frontend).
+- Acesso à internet para baixar as imagens (o backend é grande por causa do PyTorch e do GPT-2) e para verificar atualizações.
 - Cerca de **3 GB de RAM livres** para o backend (o GPT-2 e o classificador ficam carregados na memória) e alguns GB de disco para as imagens.
 - Porta **80** livre no host (ou escolha outra, veja abaixo).
 
@@ -112,9 +115,9 @@ Não precisa clonar o repositório nem instalar Python ou Node.js: o `docker-com
 1. Baixe o `docker-compose.yml` da [página de Releases](https://github.com/joaosuperb1/GotchaOnline-Docker/releases/latest) para uma pasta vazia.
 2. Nessa pasta, suba os containers:
    ```bash
-   docker compose up -d --build
+   docker compose up -d
    ```
-   A primeira execução leva alguns minutos (download do PyTorch e do GPT-2). As seguintes usam o cache e sobem em segundos.
+   A primeira execução leva alguns minutos (download das imagens). As seguintes sobem em segundos.
 3. Acesse **[http://localhost](http://localhost)** no navegador. Para acessar de outra máquina da rede, use o IP ou hostname do servidor.
 
 **Variáveis opcionais** (no ambiente ou em um arquivo `.env` ao lado do `docker-compose.yml`):
@@ -122,13 +125,15 @@ Não precisa clonar o repositório nem instalar Python ou Node.js: o `docker-com
 | Variável | Padrão | Para que serve |
 |---|---|---|
 | `GOTCHA_PORT` | `80` | Porta do host onde o site fica disponível. Ex.: `GOTCHA_PORT=8080` |
-| `GOTCHA_REF` | `main` | Branch ou tag do repositório a instalar. Ex.: `GOTCHA_REF=v1.0.0` para fixar uma versão |
+| `GOTCHA_TAG` | `latest` | Tag das imagens. `latest` acompanha o `main`; para fixar uma versão use a tag da release. Ex.: `GOTCHA_TAG=v1.1` (com tag fixa, o Watchtower não troca de versão sozinho) |
+| `GOTCHA_UPDATE_SECONDS` | `300` | Intervalo, em segundos, entre as verificações de imagem nova |
 
 **Operação do dia a dia**
 
 ```bash
-docker compose ps                # estado dos containers (backend e frontend devem estar "Up")
+docker compose ps                # estado dos containers (backend, frontend e watchtower devem estar "Up")
 docker compose logs -f backend   # logs do backend em tempo real
+docker compose logs -f watchtower # registro das atualizações automáticas
 docker compose down              # para e remove os containers
 ```
 
@@ -136,13 +141,14 @@ O backend demora alguns segundos para ficar pronto após subir (carrega o GPT-2 
 
 **Atualização**
 
+Com `GOTCHA_TAG=latest` (padrão), **não é preciso fazer nada**: a cada push no `main` que altera `backend/` ou `frontend/`, o GitHub Actions publica novas imagens e o Watchtower as aplica em até `GOTCHA_UPDATE_SECONDS` segundos. Para forçar na hora:
+
 ```bash
-docker compose down
-docker compose build --pull --no-cache
+docker compose pull
 docker compose up -d
 ```
 
-Se você fixou uma versão com `GOTCHA_REF`, troque o valor pela nova tag antes de rodar o build. Para atualizar também o arquivo, baixe o `docker-compose.yml` da release mais recente.
+Se você fixou uma versão com `GOTCHA_TAG`, troque o valor pela nova tag e rode os dois comandos acima. Para atualizar também o arquivo, baixe o `docker-compose.yml` da release mais recente.
 
 **Privacidade e segurança**
 
@@ -162,7 +168,7 @@ cd GotchaOnline-Docker
 docker compose up -d --build
 ```
 
-Acesse [http://localhost](http://localhost). Aqui o build usa os arquivos locais, então alterações em `backend/` e `frontend/` são refletidas ao refazer o build. Os requisitos e as variáveis (`GOTCHA_PORT`) são os mesmos da Opção 1.
+Acesse [http://localhost](http://localhost). Aqui o build usa os arquivos locais, então alterações em `backend/` e `frontend/` são refletidas ao refazer o build. Os requisitos e a variável `GOTCHA_PORT` são os mesmos da Opção 1, exceto que aqui o build é local (a primeira vez demora, por causa do PyTorch e do GPT-2) e não há atualização automática.
 
 ---
 

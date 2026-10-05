@@ -1,23 +1,25 @@
-# Gotcha Online — compose de release.
+# Gotcha Online — compose de produção (release).
 #
-# Este é o único arquivo necessário para instalar: ele baixa o código direto
-# do GitHub e builda as duas imagens na sua máquina (precisa de internet na
-# primeira subida). Uso:
+# Este é o único arquivo necessário para instalar: ele baixa as imagens
+# prontas do GitHub Container Registry (sem build local) e inclui o
+# Watchtower, que verifica o registro periodicamente e atualiza os containers
+# sozinho quando uma imagem nova é publicada. Uso:
 #
-#   docker compose up -d --build
+#   docker compose up -d
 #
 # Variáveis opcionais (no ambiente ou em um arquivo .env ao lado deste):
-#   GOTCHA_REF   branch ou tag do repositório a instalar (padrão: main).
-#                Ex.: GOTCHA_REF=v1.0.0 para fixar uma versão.
-#   GOTCHA_PORT  porta do host onde o site fica disponível (padrão: 80).
+#   GOTCHA_TAG            tag das imagens (padrão: latest, que acompanha o main).
+#                         Ex.: GOTCHA_TAG=v1.1 fixa uma versão. Com tag fixa o
+#                         Watchtower não troca de versão sozinho.
+#   GOTCHA_PORT           porta do host onde o site fica disponível (padrão: 80).
+#   GOTCHA_UPDATE_SECONDS intervalo, em segundos, entre as verificações de
+#                         imagem nova (padrão: 300).
 
 services:
   # API Flask + Gunicorn (GPT-2 + classificador). Não é exposta ao host: só o
   # frontend alcança, pela rede interna do Docker.
   backend:
-    build:
-      context: https://github.com/joaosuperb1/GotchaOnline-Docker.git#${GOTCHA_REF:-main}:backend
-    image: gotcha-backend:latest
+    image: ghcr.io/joaosuperb1/gotcha-backend:${GOTCHA_TAG:-latest}
     container_name: gotcha_backend
     restart: always
     expose:
@@ -26,17 +28,30 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - /tmp/uploads
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
 
   # Nginx servindo o site e fazendo proxy de /api/ para o backend.
   frontend:
-    build:
-      context: https://github.com/joaosuperb1/GotchaOnline-Docker.git#${GOTCHA_REF:-main}:frontend
-      args:
-        - VITE_BACKEND_URL=/api/processar
-    image: gotcha-frontend:latest
+    image: ghcr.io/joaosuperb1/gotcha-frontend:${GOTCHA_TAG:-latest}
     container_name: gotcha_frontend
     restart: always
     ports:
       - "${GOTCHA_PORT:-80}:80"
     depends_on:
       - backend
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+
+  # Atualização automática: puxa imagens novas do registro e recria só os
+  # containers com o label acima, removendo as imagens antigas.
+  watchtower:
+    image: nickfedor/watchtower:latest
+    container_name: gotcha_watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_LABEL_ENABLE=true
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=${GOTCHA_UPDATE_SECONDS:-300}
